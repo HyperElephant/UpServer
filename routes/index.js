@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var firebase = require('firebase');
 
-
 firebase.initializeApp({
   serviceAccount: "serviceAccountCredentials.json",
   databaseURL: "https://you-up-59f97.firebaseio.com/"
@@ -10,26 +9,30 @@ firebase.initializeApp({
 
 // Get a database reference to our posts
 var db = firebase.database();
-var ref = db.ref("ups");
+var ref = db.ref("inquiry");
 
 // Attach an asynchronous callback to read the data at our reference
-ref.on("value", function(snapshot) {
-  console.log(snapshot.val());
-  setTimeout(evaluatePush(snapshot), 30000);
+ref.on("child_added", function(snapshot) {
+  console.log(snapshot.key);
+  evaluatePush(snapshot);
 }, function (errorObject) {
   console.log("The read failed: " + errorObject.code);
 });
 
 function evaluatePush(snapshot) {
-  if (snapshot.child("seen") == false) {
-    push(snapshot);
-  }
+  //console.log(snapshot);
+  setTimeout(push(snapshot), 1000);
+
 }
 
-function push(snapshot){
-  console.log("Pushed: " + snapshot.key);
-}
+function push(originalSnapshot){
+  ref.child(originalSnapshot.key).once("value", function(snapshot) {
+    if(snapshot.val().seen == false){
+       console.log("Pushed: ");
+    }
+  });
 
+}
 
 /* GET home page. */
 
