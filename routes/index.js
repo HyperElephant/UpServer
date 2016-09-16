@@ -14,25 +14,14 @@ var ref = db.ref("inquiry");
 // Attach an asynchronous callback to read the data at our reference
 ref.on("child_added", function(snapshot) {
   console.log(snapshot.key);
-  evaluatePush(snapshot);
+  setTimeout(function () {
+    ref.child(snapshot.key).once("value", function(laterSnapshot) {
+      if(snapshot.val().seen == false){
+         console.log("Pushed: ");
+      }});}, 10000);
 }, function (errorObject) {
   console.log("The read failed: " + errorObject.code);
 });
-
-function evaluatePush(snapshot) {
-  //console.log(snapshot);
-  setTimeout(push(snapshot), 1000);
-
-}
-
-function push(originalSnapshot){
-  ref.child(originalSnapshot.key).once("value", function(snapshot) {
-    if(snapshot.val().seen == false){
-       console.log("Pushed: ");
-    }
-  });
-
-}
 
 /* GET home page. */
 
